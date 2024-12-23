@@ -2,6 +2,7 @@ package org.example;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -10,8 +11,27 @@ public class Main {
         System.out.println("System will now load assigned task files.");
 
         String filePath = "tasks.csv";
-        ArrayList<String[]> fileTasks = loadFiles(filePath);
+        ArrayList<String[]> tasks = loadTasks(filePath);
 
+
+        Scanner scanner = new Scanner(System.in);
+
+        printOptions();
+
+        while (true) {
+            String command = scanner.nextLine().trim().toLowerCase();
+            System.out.println("Your command is: " + command.toUpperCase());
+
+            switch (command) {
+                case "add" -> addingTask(tasks, scanner);
+                case "remove" -> removingTask(tasks, scanner);
+                case "list" -> listingTasks(tasks);
+                case "exit" -> programExit(tasks, filePath, scanner);
+                default -> System.out.println("Invalid task selection. Please enter a valid task");
+            }
+        }
+    }
+    public static void printOptions(){
         System.out.println("Please type name of possible operations to proceed.");
         System.out.println("Select the task from the list below:");
         System.out.println("1) Add");
@@ -19,36 +39,9 @@ public class Main {
         System.out.println("3) List");
         System.out.println("4) Exit");
         System.out.println("Command in not case sensitive.");
-
-        Scanner scanner = new Scanner(System.in);
-        Boolean exit = false;
-
-        while (!exit) {
-            String command = scanner.nextLine().trim().toLowerCase();
-            System.out.println("Your command is: " + command.toUpperCase());
-
-            switch (command) {
-                case "add":
-                    addingATask(fileTasks);
-                    break;
-                case "remove":
-                    removingATask(fileTasks);
-                    break;
-                case "list":
-                    listingOfTasks(fileTasks);
-                    break;
-                case "exit":
-                    terminationOfTheProgram();
-                    break;
-                default:
-                    System.out.println("Invalid task selection. Please enter a valid task");
-                    break;
-            }
-        }
-        scanner.close();
     }
 
-    public static ArrayList<String[]> loadFiles(String filepath) {
+    public static ArrayList<String[]> loadTasks(String filepath) {
         ArrayList<String[]> fileTasks = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;
@@ -62,73 +55,73 @@ public class Main {
         return fileTasks;
     }
 
-    public static ArrayList<String[]> addingATask(String fileTasks) {
-        Scanner scanner = new Scanner(System.in);
+    public static void addingTask(ArrayList<String[]> tasks, Scanner scanner) {
 
         System.out.println("Enter note:");
         String note = scanner.nextLine();
+        while (note.isEmpty()){
+            System.out.println("Please enter some text to create a note.");
+            note = scanner.nextLine();
+        }
 
         System.out.println("Enter date in YYYY-MM-DD format:");
         String date = scanner.nextLine();
-        if (!date.matches("\\d{4}-\\d{2}-\\d{2}")){
+        while (!date.matches("\\d{4}-\\d{2}-\\d{2}")){
             System.out.println("Format is not valid. Please enter the value again.");
+            date = scanner.nextLine();
         }
 
         System.out.println("Enter true/false value for statement of task completion:");
         String statusInput = scanner.nextLine();
+
         while (!statusInput.equalsIgnoreCase("true") && !statusInput.equalsIgnoreCase("false")) {
             System.out.println("Invalid input. Please enter true or false:");
             statusInput = scanner.nextLine();
         }
         boolean status = Boolean.parseBoolean(statusInput);
 
-        fileTasks.add(new String[]{note, date, String.valueOf(status)});
+        tasks.add(new String[]{note, date, String.valueOf(status)});
         System.out.println("Task added successfully.");
     }
 
-    public static ArrayList<String[]> removingATask(ArrayList<String[]> fileTasks) {
-        System.out.println("Current tasks:");
-        StringBuilder sb = new StringBuilder();
-        int rowNumber = 1;
-        for (String[] row : fileTasks) {
-            sb.append(rowNumber).append(".");
-            sb.append(String.join(",", row)).append("\n");
-            rowNumber = rowNumber + 1;
-        }
-        System.out.println(sb.toString());
+    public static void removingTask(ArrayList<String[]> tasks, Scanner scanner) {
+
+        listingTasks(tasks);
 
         System.out.println("Please choose row number of task to be erased:");
-        Scanner scanner = new Scanner(System.in);
-
-        try{
-            int taskToBeErased = Integer.parseInt(scanner.nextLine());
-            if (taskToBeErased < 1 || taskToBeErased > fileTasks.size()) {
-                System.out.println("Invalid input. Please insert valid row number.");
-            } else {
-                String[] removedTask = fileTasks.remove(taskToBeErased - 1);
+        while(true) {
+            try {
+                int taskToBeErased = Integer.parseInt(scanner.nextLine());
+                if (taskToBeErased < 1 && taskToBeErased > tasks.size()) {
+                    System.out.println("Invalid input. Please insert valid row number.");
+                }
+                String[] removedTask = tasks.remove(taskToBeErased - 1);
                 System.out.println("Removed task: " + String.join(", ", removedTask));
+                System.out.println("Task removed successfully.");
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid value. Please enter a valid row number to erase it.");
             }
-        } catch (NumberFormatException e){
-            System.out.println("Invalid value. Please enter a valid row number to erase it.");
         }
+    }
+
+    public static void listingTasks(ArrayList<String[]> tasks) {
+        for (int i = 0; i < tasks.size(); i++) {
+            System.out.println((i + 1) + ": " + Arrays.toString(tasks.get(i)));
+        }
+    }
+
+    public static void programExit(ArrayList<String[]> tasks, String filePath, Scanner scanner) {
+        saveTasksToFile(tasks, filePath);
+
         scanner.close();
-        return fileTasks;
-    }
 
-    public static void listingOfTasks(ArrayList<String[]> fileTasks) {
-        StringBuilder sb = new StringBuilder();
-        int rowNumber = 1;
-        for (String[] row : fileTasks) {
-            sb.append(rowNumber).append(".");
-            sb.append(String.join(",", row)).append("\n");
-            rowNumber = rowNumber + 1;
-        }
-        System.out.println(sb.toString());
+        System.out.println(ConsoleColors.RED + "Exiting the program." + ConsoleColors.RESET);
+        System.exit(0);
     }
-
-    public static void terminationOfTheProgram(ArrayList<String[]> fileTasks, String filePath) {
-        try (PrintWriter reader = new PrintWriter(new FileWriter(filePath))) {
-            for (String task:fileTasks) {
+    public static void saveTasksToFile(ArrayList<String[]> tasks, String filePath){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filePath))) {
+            for (String[] task:tasks) {
                 writer.println(String.join(", ", task));
             }
             System.out.println("Tasks saved successfully.");
@@ -137,9 +130,5 @@ public class Main {
             System.err.println("Problem with saving the file. Unable to locate the folder..");
             e.printStackTrace(System.err);
         }
-        System.out.println(ConsoleColors.RED + "Exiting the program." + ConsoleColors.RESET);
-        System.exit(0);
-
-
     }
 }
