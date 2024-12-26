@@ -18,12 +18,12 @@ public class TaskManager {
     private static final String[] OPTIONS = {"add", "remove", "list", "exit"};
     public static final String DELIMITER = ", ";
     public static final String SEPARATOR = "-----------------";
+    public static final int TASK_ITEMS_COUNT = 3;
 
     private static String[][] tasks;
     private static Scanner scanner;
 
-
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         init();
 
         while (true) {
@@ -50,7 +50,7 @@ public class TaskManager {
         System.out.println(ConsoleColors.GREEN_BOLD + SEPARATOR);
     }
 
-    public static void printOptions(String[] tab) {
+    public static void printOptions(final String[] tab) {
         System.out.println(ConsoleColors.BLUE);
         System.out.println("Please select an option: " + ConsoleColors.RESET);
         for (String option : tab) {
@@ -77,7 +77,7 @@ public class TaskManager {
         System.out.println("Task is important [true/false]: :");
         final var isImportant = loadAndValidateIsImportant();
 
-        final var task = new String[3];
+        final var task = new String[TASK_ITEMS_COUNT];
         task[0] = name;
         task[1] = date;
         task[2] = isImportant;

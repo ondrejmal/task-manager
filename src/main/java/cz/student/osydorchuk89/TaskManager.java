@@ -2,7 +2,7 @@ package cz.student.osydorchuk89;
 
 public class TaskManager {
 
-    public static void main(String[] args){
+    public static void main(final String[] args) {
 
     }
 
