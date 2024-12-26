@@ -1,4 +1,4 @@
-package org.example;
+package cz.common;
 
 /**
  * https://stackoverflow.com/a/45444716
