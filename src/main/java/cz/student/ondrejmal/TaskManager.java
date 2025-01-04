@@ -8,27 +8,30 @@ import java.util.Scanner;
 
 public class TaskManager {
 
+    private static final String FILE_PATH = "tasks.csv";
+    private static ArrayList<String[]> tasks;
+    private static Scanner scanner;
+
     public static void main(String[] args) {
         System.out.println(ConsoleColors.BLUE + "Task Manager Coderslab" + ConsoleColors.RESET);
         System.out.println("System will now load assigned task files.");
 
         String filePath = "tasks.csv";
-        ArrayList<String[]> tasks = loadTasks(filePath);
-
+        ArrayList<String[]> tasks = loadTasks(FILE_PATH);
 
         Scanner scanner = new Scanner(System.in);
 
         printOptions();
 
         while (true) {
-            String command = scanner.nextLine().trim().toLowerCase();
+            final String command = scanner.nextLine().trim().toLowerCase();
             System.out.println("Your command is: " + command.toUpperCase());
 
             switch (command) {
                 case "add" -> addingTask(tasks, scanner);
                 case "remove" -> removingTask(tasks, scanner);
                 case "list" -> listingTasks(tasks);
-                case "exit" -> programExit(tasks, filePath, scanner);
+                case "exit" -> programExit(tasks, FILE_PATH, scanner);
                 default -> System.out.println("Invalid task selection. Please enter a valid task");
             }
         }
@@ -45,14 +48,13 @@ public class TaskManager {
     }
 
     public static ArrayList<String[]> loadTasks(String filepath) {
-        ArrayList<String[]> fileTasks = new ArrayList<>();
+        final ArrayList<String[]> fileTasks = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath))) {
             String line;
             while ((line = reader.readLine()) != null)
                 fileTasks.add(line.split(","));
-        } catch (
-                IOException e) {
-            System.err.println("Problem with loading the file. File not found. Check if the file exists.");
+        } catch (IOException e) {
+            System.err.println("Failed to load tasks.csv.");
             e.printStackTrace(System.err);
         }
         return fileTasks;
@@ -83,7 +85,7 @@ public class TaskManager {
         }
         boolean status = Boolean.parseBoolean(statusInput);
 
-        tasks.add(new String[]{note, date, String.valueOf(status)});
+        tasks.add(new String[]{note, date, statusInput});
         System.out.println("Task added successfully.");
     }
 
@@ -94,11 +96,11 @@ public class TaskManager {
         System.out.println("Please choose row number of task to be erased:");
         while (true) {
             try {
-                int taskToBeErased = Integer.parseInt(scanner.nextLine());
+                final int taskToBeErased = Integer.parseInt(scanner.nextLine());
                 if (taskToBeErased < 1 && taskToBeErased > tasks.size()) {
                     System.out.println("Invalid input. Please insert valid row number.");
                 }
-                String[] removedTask = tasks.remove(taskToBeErased - 1);
+                final String[] removedTask = tasks.remove(taskToBeErased - 1);
                 System.out.println("Removed task: " + String.join(", ", removedTask));
                 System.out.println("Task removed successfully.");
                 break;
@@ -133,6 +135,7 @@ public class TaskManager {
         } catch (IOException e) {
             System.err.println("Problem with saving the file. Unable to locate the folder.");
             e.printStackTrace(System.err);
+            System.exit(1);
         }
     }
 }
