@@ -16,10 +16,9 @@ public class TaskManager {
         System.out.println(ConsoleColors.BLUE + "Task Manager Coderslab" + ConsoleColors.RESET);
         System.out.println("System will now load assigned task files.");
 
-        String filePath = "tasks.csv";
-        ArrayList<String[]> tasks = loadTasks(FILE_PATH);
+        tasks = loadTasks(FILE_PATH);
 
-        Scanner scanner = new Scanner(System.in);
+        scanner = new Scanner(System.in);
 
         printOptions();
 
@@ -83,7 +82,6 @@ public class TaskManager {
             System.out.println("Invalid input. Please enter true or false:");
             statusInput = scanner.nextLine();
         }
-        boolean status = Boolean.parseBoolean(statusInput);
 
         tasks.add(new String[]{note, date, statusInput});
         System.out.println("Task added successfully.");
